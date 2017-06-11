@@ -14,8 +14,10 @@ public class MainActivity extends AGActivityGame {
         init(this, false);
         PrimeiraCena cena1 = new PrimeiraCena(this.vrManager);
         SegundaCena cena2 = new SegundaCena(this.vrManager);
+        CreditosCena cena3 = new CreditosCena(this.vrManager);
         vrManager.addScene(cena1);
         vrManager.addScene(cena2);
+        vrManager.addScene(cena3);
 
     }
 }
