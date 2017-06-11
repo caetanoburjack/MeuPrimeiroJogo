@@ -3,6 +3,8 @@ package com.example.caetano.meuprimeirojogo;
 import com.example.caetano.meuprimeirojogo.andgraph.AGGameManager;
 import com.example.caetano.meuprimeirojogo.andgraph.AGInputManager;
 import com.example.caetano.meuprimeirojogo.andgraph.AGScene;
+import com.example.caetano.meuprimeirojogo.andgraph.AGScreenManager;
+import com.example.caetano.meuprimeirojogo.andgraph.AGSprite;
 import com.example.caetano.meuprimeirojogo.andgraph.AGTimeManager;
 import com.example.caetano.meuprimeirojogo.andgraph.AGTimer;
 
@@ -11,18 +13,33 @@ import com.example.caetano.meuprimeirojogo.andgraph.AGTimer;
  */
 
 public class SegundaCena extends AGScene {
+    AGSprite bulldog = null;
+    AGSprite briga = null;
+    //AGTimer tempo;
+
     SegundaCena(AGGameManager gerenteJogo) {
         super(gerenteJogo);
     }
 
-    AGTimer tempo;
 
     @Override
     public void init() {//metodo chamado para iniciar a cena, chamado uma unica vez quando esta cena for colocada na tela
 
-        tempo = new AGTimer(3000);
+        //tempo = new AGTimer(3000);
 
-        setSceneBackgroundColor(1.0f, 1.0f, 0.0f);
+        setSceneBackgroundColor(1.0f, 1.0f, 1.0f);
+        briga = createSprite(R.drawable.briga, 8, 4);
+        briga.setScreenPercent(20, 40);
+        briga.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        briga.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
+        briga.addAnimation(15, true, 0, 23);
+
+
+        bulldog = createSprite(R.drawable.buldogue, 4, 4);
+        bulldog.setScreenPercent(10, 20);
+        bulldog.vrPosition.setX(AGScreenManager.iScreenWidth - bulldog.getSpriteWidth() / 2);
+        bulldog.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
+        bulldog.addAnimation(10, true, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
     }
 
     @Override
@@ -37,9 +54,9 @@ public class SegundaCena extends AGScene {
 
     @Override
     public void loop() {//vai ficar executando pra sempre e se repetindo
-        tempo.update();
-        if (tempo.isTimeEnded()) {
-            this.vrGameManager.setCurrentScene(0);
-        }
+//        tempo.update();
+//        if (tempo.isTimeEnded()) {
+//            this.vrGameManager.setCurrentScene(0);
+//        }
     }
 }
