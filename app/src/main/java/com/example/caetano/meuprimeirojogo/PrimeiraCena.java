@@ -52,8 +52,8 @@ public class PrimeiraCena extends AGScene {
         //DEFININDO O BOTÃO SAIR
         sair = this.createSprite(R.drawable.sair, 1, 1);
         sair.setScreenPercent(30, 15);
-        sair.vrPosition.setX(AGScreenManager.iScreenWidth * 2);
-        sair.vrPosition.setY(AGScreenManager.iScreenHeight * 3 / 2);
+        sair.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        sair.vrPosition.setY(play.vrPosition.getY() - play.getSpriteHeight() * 3 / 2);
 
 
     }
@@ -75,10 +75,12 @@ public class PrimeiraCena extends AGScene {
 //        }
         if (play.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
             vrGameManager.setCurrentScene(1);
+            return;
         }
 
         if (creditos.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
             vrGameManager.setCurrentScene(2);
+            return;
         }
 
         //METODO PARA SAIR DA APLICAÇÃO

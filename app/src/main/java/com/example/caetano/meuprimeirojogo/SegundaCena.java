@@ -88,8 +88,8 @@ public class SegundaCena extends AGScene {
     }
 
     private void logicaJogo() {
-        gato.vrPosition.fX += 20;
-        bulldog.vrPosition.fX -= 20;
+        gato.vrPosition.fX += 10;
+        bulldog.vrPosition.fX -= 10;
         if (bulldog.collide(gato)) {
             bulldog.bVisible = false;
             gato.bVisible = false;
