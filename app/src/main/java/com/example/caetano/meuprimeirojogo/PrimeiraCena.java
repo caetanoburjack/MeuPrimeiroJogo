@@ -39,21 +39,21 @@ public class PrimeiraCena extends AGScene {
 
         //DEFININDO O BOTÃO PLAY
         play = this.createSprite(R.drawable.play, 1, 1);
-        play.setScreenPercent(30, 15);
-        play.vrPosition.setX(AGScreenManager.iScreenWidth / 3);
-        play.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
+        play.setScreenPercent(60, 15);
+        play.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        play.vrPosition.setY(AGScreenManager.iScreenHeight * 2 / 3);
 
         //DEFININDO O BOTÃO CREDITOS
         creditos = this.createSprite(R.drawable.credits, 1, 1);
-        creditos.setScreenPercent(30, 15);
-        creditos.vrPosition.setX(AGScreenManager.iScreenWidth * 2 / 3);
+        creditos.setScreenPercent(60, 15);
+        creditos.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
         creditos.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
 
         //DEFININDO O BOTÃO SAIR
         sair = this.createSprite(R.drawable.sair, 1, 1);
-        sair.setScreenPercent(30, 15);
+        sair.setScreenPercent(60, 15);
         sair.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
-        sair.vrPosition.setY(play.vrPosition.getY() - play.getSpriteHeight() * 3 / 2);
+        sair.vrPosition.setY(AGScreenManager.iScreenHeight * 1 / 3);
 
 
     }
@@ -74,7 +74,7 @@ public class PrimeiraCena extends AGScene {
 //            this.vrGameManager.setCurrentScene(1);
 //        }
         if (play.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
-            vrGameManager.setCurrentScene(1);
+            vrGameManager.setCurrentScene(3);
             return;
         }
 
