@@ -243,25 +243,7 @@ public class CenaJogo extends AGScene {
         if (AGInputManager.vrTouchEvents.screenClicked()) {
             if (pontuacao <= 0) {
                 bPausa = true;
-                // Carrega a imagem gameover
-                gameOver = createSprite(R.drawable.gameover, 1, 1);
-                gameOver.setScreenPercent(70, 24);
-                gameOver.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
-                gameOver.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
-
-                // Carrega a imagem voltarMenu
-                voltarMenu = createSprite(R.drawable.voltar, 1, 1);
-                voltarMenu.setScreenPercent(20, 12);
-                voltarMenu.vrPosition.setX(voltarMenu.getSpriteWidth() / 2);
-                voltarMenu.vrPosition.setY(voltarMenu.getSpriteHeight() / 2);
-
-                // Carrega a imagem playagain
-                playagain = createSprite(R.drawable.playagain, 1, 1);
-                playagain.setScreenPercent(50, 12);
-                playagain.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
-                playagain.vrPosition.setY(AGScreenManager.iScreenHeight * 1 / 3);
-
-
+                gameOver();
             } else {
                 pontuacao -= marteloGrandePena;
             }
@@ -286,6 +268,26 @@ public class CenaJogo extends AGScene {
             novaBala.vrPosition.fY = canhao.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
             vetorTiros.add(novaBala);
         }
+    }
+
+    private void gameOver() {
+        // Carrega a imagem gameover
+        gameOver = createSprite(R.drawable.gameover, 1, 1);
+        gameOver.setScreenPercent(70, 24);
+        gameOver.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        gameOver.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
+
+        // Carrega a imagem voltarMenu
+        voltarMenu = createSprite(R.drawable.voltar, 1, 1);
+        voltarMenu.setScreenPercent(20, 12);
+        voltarMenu.vrPosition.setX(voltarMenu.getSpriteWidth() / 2);
+        voltarMenu.vrPosition.setY(voltarMenu.getSpriteHeight() / 2);
+
+        // Carrega a imagem playagain
+        playagain = createSprite(R.drawable.playagain, 1, 1);
+        playagain.setScreenPercent(50, 12);
+        playagain.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        playagain.vrPosition.setY(AGScreenManager.iScreenHeight * 1 / 3);
     }
 
     // metodo para atualizar o movimento das balas
