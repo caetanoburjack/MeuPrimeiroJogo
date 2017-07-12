@@ -20,8 +20,12 @@ public class CenaJogo extends AGScene {
     private int efeitoCatraca = 0; //som do canhao
     private int efeitoExplosao = 0; //som da explosao
     private int multiplicador = 1; //multiplicador para o placar
-    private int pontuacao = 0; //multiplicador para o placar
-    private int tempPontuacao = 0; //multiplicador para o placar
+    private int pontuacao = 100; //multiplicador para o placar
+    private int tempPontuacao = 100; //multiplicador para o placar
+    private int marteloGrandeBonus = 10;
+    private int marteloGrandePena = 20;
+    private int marteloPequenoBonus = 20;
+    private int marteloPequenoPena = 10;
 
     private AGTimer tempoCanhao = null; //Tempo para controle do movimento do canhao
     private AGTimer tempoBala = null; //Tempo para controle das balas
@@ -30,10 +34,13 @@ public class CenaJogo extends AGScene {
     private AGSprite planoFundo = null;
     private AGSprite canhao = null;
     private AGSprite barraSuperior = null;
+    private AGSprite gameOver = null;
+    private AGSprite playagain = null;
+    private AGSprite voltarMenu = null;
 
     ArrayList<AGSprite> vetorTiros = null;
     ArrayList<AGSprite> vetorExplosoes = null;
-    AGSprite[] navios = new AGSprite[3];
+    AGSprite[] navios = new AGSprite[2];
     AGSprite[] placar = new AGSprite[6];
 
     boolean bPausa = false;
@@ -65,36 +72,40 @@ public class CenaJogo extends AGScene {
         canhao.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
         canhao.vrPosition.setY(canhao.getSpriteHeight() / 2);
 
-        barraSuperior = createSprite(R.drawable.barrasuperior, 1, 1);
-        barraSuperior.setScreenPercent(100, 10);
+
+        barraSuperior = createSprite(R.drawable.back, 1, 1);
+        barraSuperior.setScreenPercent(100, 6);
         barraSuperior.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
         barraSuperior.vrPosition.fY = AGScreenManager.iScreenHeight - barraSuperior.getSpriteHeight() / 2;
         barraSuperior.bAutoRender = false;
 
         //DEFININDO OS NAVIOS
-        navios[0] = createSprite(R.drawable.navio, 1, 1);
+        navios[0] = createSprite(R.drawable.vampirao, 4, 2);
         navios[0].setScreenPercent(20, 12);
+        navios[0].addAnimation(10, true, 0, 1, 2, 3, 4, 5, 6, 7);
         navios[0].iMirror = AGSprite.HORIZONTAL;
         navios[0].vrDirection.fX = 1;
         navios[0].vrPosition.fX = -navios[0].getSpriteWidth() / 2;
         navios[0].vrPosition.fY = AGScreenManager.iScreenHeight - navios[0].getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
 
-        navios[1] = createSprite(R.drawable.navio, 1, 1);
+        navios[1] = createSprite(R.drawable.passaro, 5, 3);
         navios[1].setScreenPercent(20, 12);
+        navios[1].addAnimation(10, true, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13);
         navios[1].vrDirection.fX = -1;
+        navios[1].iMirror = AGSprite.HORIZONTAL;
         navios[1].vrPosition.fX = AGScreenManager.iScreenWidth + navios[1].getSpriteWidth() / 2;
         navios[1].vrPosition.fY = navios[0].vrPosition.fY - navios[1].getSpriteHeight();
 
-        navios[2] = createSprite(R.drawable.navio, 1, 1);
-        navios[2].setScreenPercent(20, 12);
-        navios[2].iMirror = AGSprite.HORIZONTAL;
-        navios[2].vrDirection.fX = 1;
-        navios[2].vrPosition.fX = AGScreenManager.iScreenWidth + navios[2].getSpriteWidth() / 2;
-        navios[2].vrPosition.fY = navios[1].vrPosition.fY - navios[2].getSpriteHeight();
+//        navios[2] = createSprite(R.drawable.navio, 1, 1);
+//        navios[2].setScreenPercent(20, 12);
+//        navios[2].iMirror = AGSprite.HORIZONTAL;
+//        navios[2].vrDirection.fX = 1;
+//        navios[2].vrPosition.fX = AGScreenManager.iScreenWidth + navios[2].getSpriteWidth() / 2;
+//        navios[2].vrPosition.fY = navios[1].vrPosition.fY - navios[2].getSpriteHeight();
 
         for (int pos = 0; pos < placar.length; pos++) {
-            placar[pos] = createSprite(R.drawable.fonte, 4, 4);
-            placar[pos].setScreenPercent(8, 8);
+            placar[pos] = createSprite(R.drawable.numeros, 10, 1);
+            placar[pos].setScreenPercent(6, 6);
             placar[pos].vrPosition.fY = barraSuperior.vrPosition.fY;
             placar[pos].vrPosition.fX = 20 + multiplicador * placar[pos].getSpriteWidth();
             placar[pos].bAutoRender = false;
@@ -115,23 +126,41 @@ public class CenaJogo extends AGScene {
 
     @Override
     public void restart() {
-
     }
 
     @Override
     public void stop() {
-
     }
 
     @Override
     public void loop() {
-        if (AGInputManager.vrTouchEvents.backButtonClicked()) {
-            bPausa = !bPausa;
-
-
-// vrGameManager.setCurrentScene(0);
-//            return;
+        if (playagain != null) {
+            if (playagain.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                playagain.bRecycled = true;
+                playagain.bVisible = false;
+                voltarMenu.bRecycled = true;
+                voltarMenu.bVisible = false;
+                gameOver.bRecycled = true;
+                gameOver.bVisible = false;
+                pontuacao = 100;
+                bPausa = false;
+                return;
+            }
         }
+        if (voltarMenu != null) {
+            if (voltarMenu.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                vrGameManager.setCurrentScene(0);
+                return;
+            }
+        }
+
+
+//        if (AGInputManager.vrTouchEvents.backButtonClicked()) {
+//            bPausa = !bPausa;
+//// vrGameManager.setCurrentScene(0);
+////            return;
+//        }
+
 
         if (bPausa == false) {
             atualizaMovimentoCanhao();
@@ -145,17 +174,17 @@ public class CenaJogo extends AGScene {
     }
 
     private void atualizaPlacar() {
-        if (tempPontuacao > 0) {
-//            for (AGSprite digito : placar) {
-//                digito.bVisible = !digito.bVisible;
-//            }
-            tempPontuacao--;
-            pontuacao++;
-        } else {
-//            for (AGSprite digito : placar) {
-//                digito.bVisible = true;
-//            }
-        }
+//        if (tempPontuacao > 0) {
+////            for (AGSprite digito : placar) {
+////                digito.bVisible = !digito.bVisible;
+////            }
+//            tempPontuacao--;
+//            pontuacao++;
+//        } else {
+////            for (AGSprite digito : placar) {
+////                digito.bVisible = true;
+////            }
+//        }
         placar[5].setCurrentAnimation(pontuacao % 10);
         placar[4].setCurrentAnimation((pontuacao % 100) / 10);
         placar[3].setCurrentAnimation((pontuacao % 1000) / 100);
@@ -187,7 +216,7 @@ public class CenaJogo extends AGScene {
                 continue;
             for (AGSprite navio : navios) {
                 if (bala.collide(navio)) {
-                    tempPontuacao += 50;
+                    pontuacao += marteloGrandeBonus + marteloGrandePena;
                     criaExplosao(navio.vrPosition.fX, navio.vrPosition.fY);
                     bala.bRecycled = true;
                     bala.bVisible = false;
@@ -212,10 +241,33 @@ public class CenaJogo extends AGScene {
 
         // Tenta reciclar uma bala criada anteriormente
         if (AGInputManager.vrTouchEvents.screenClicked()) {
+            if (pontuacao <= 0) {
+                bPausa = true;
+                // Carrega a imagem gameover
+                gameOver = createSprite(R.drawable.gameover, 1, 1);
+                gameOver.setScreenPercent(70, 24);
+                gameOver.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+                gameOver.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
+
+                // Carrega a imagem voltarMenu
+                voltarMenu = createSprite(R.drawable.voltar, 1, 1);
+                voltarMenu.setScreenPercent(20, 12);
+                voltarMenu.vrPosition.setX(voltarMenu.getSpriteWidth() / 2);
+                voltarMenu.vrPosition.setY(voltarMenu.getSpriteHeight() / 2);
+
+                // Carrega a imagem playagain
+                playagain = createSprite(R.drawable.playagain, 1, 1);
+                playagain.setScreenPercent(50, 12);
+                playagain.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+                playagain.vrPosition.setY(AGScreenManager.iScreenHeight * 1 / 3);
+
+
+            } else {
+                pontuacao -= marteloGrandePena;
+            }
             if (!tempoBala.isTimeEnded()) {
                 return;
             }
-
             tempoBala.restart();
 
             for (AGSprite bala : vetorTiros) {
@@ -228,7 +280,7 @@ public class CenaJogo extends AGScene {
                 }
             }
 
-            AGSprite novaBala = createSprite(R.drawable.bala, 1, 1);
+            AGSprite novaBala = createSprite(R.drawable.martelo, 1, 1);
             novaBala.setScreenPercent(8, 5);
             novaBala.vrPosition.fX = canhao.vrPosition.fX;
             novaBala.vrPosition.fY = canhao.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
@@ -240,10 +292,12 @@ public class CenaJogo extends AGScene {
     private void atualizaBalas() {
         for (AGSprite bala : vetorTiros) {
             bala.vrPosition.fY += 10;
+            bala.fAngle -= 10f;
 
             if (bala.vrPosition.fY > AGScreenManager.iScreenHeight + bala.getSpriteHeight() / 2) {
                 bala.bRecycled = true;
                 bala.bVisible = false;
+
             }
         }
     }
