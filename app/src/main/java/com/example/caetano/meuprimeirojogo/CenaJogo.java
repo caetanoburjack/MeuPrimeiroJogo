@@ -20,25 +20,33 @@ public class CenaJogo extends AGScene {
     private int efeitoCatraca = 0; //som do canhao
     private int efeitoExplosao = 0; //som da explosao
     private int multiplicador = 1; //multiplicador para o placar
-    private int pontuacao = 100; //multiplicador para o placar
-    private int tempPontuacao = 100; //multiplicador para o placar
-    private int marteloGrandeBonus = 10;
-    private int marteloGrandePena = 20;
-    private int marteloPequenoBonus = 20;
-    private int marteloPequenoPena = 10;
+    private int pontuacao = 1000; //
+    private int tempPontuacao = 100; //
+    private int martelaoBonus = 10;
+    private int martelaoPena = 20;
+    private int martelinhoBonus = 20;
+    private int martelinhoPena = 10;
+    private int bonificacao = 0;
+    private int penalizacao = 0;
 
     private AGTimer tempoCanhao = null; //Tempo para controle do movimento do canhao
     private AGTimer tempoBala = null; //Tempo para controle das balas
 
     private AGSprite btnVoltar = null;
     private AGSprite planoFundo = null;
-    private AGSprite canhao = null;
+    private AGSprite juiz = null;
     private AGSprite barraSuperior = null;
+    private AGSprite barraInferior = null;
+    private AGSprite btnMartelinho = null;
+    private AGSprite btnMartelao = null;
     private AGSprite gameOver = null;
     private AGSprite playagain = null;
     private AGSprite voltarMenu = null;
+    private AGSprite setaDireita = null;
+    private AGSprite setaEsquerda = null;
 
-    ArrayList<AGSprite> vetorTiros = null;
+    ArrayList<AGSprite> vetorMarteloes = null;
+    ArrayList<AGSprite> vetorMartelinhos = null;
     ArrayList<AGSprite> vetorExplosoes = null;
     AGSprite[] navios = new AGSprite[2];
     AGSprite[] placar = new AGSprite[6];
@@ -54,23 +62,20 @@ public class CenaJogo extends AGScene {
         setSceneBackgroundColor(1, 1, 1);
         tempoCanhao = new AGTimer(100);
         tempoBala = new AGTimer(150);
-        vetorTiros = new ArrayList<AGSprite>();
+        vetorMartelinhos = new ArrayList<AGSprite>();
+        vetorMarteloes = new ArrayList<AGSprite>();
         vetorExplosoes = new ArrayList<AGSprite>();
 
         efeitoCatraca = AGSoundManager.vrSoundEffects.loadSoundEffect("toc.wav");
         efeitoExplosao = AGSoundManager.vrSoundEffects.loadSoundEffect("explodenavio.wav");
 
         // Carrega a imagem de fundo 100x100 centro da tela
-        planoFundo = createSprite(R.drawable.textmar, 1, 1);
+        planoFundo = createSprite(R.drawable.natureza, 1, 1);
         planoFundo.setScreenPercent(100, 100);
         planoFundo.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
         planoFundo.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
 
-        // Carrega a imagem do canhao na base da tela
-        canhao = createSprite(R.drawable.canhao, 1, 1);
-        canhao.setScreenPercent(12, 20);
-        canhao.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
-        canhao.vrPosition.setY(canhao.getSpriteHeight() / 2);
+
 
 
         barraSuperior = createSprite(R.drawable.back, 1, 1);
@@ -79,11 +84,50 @@ public class CenaJogo extends AGScene {
         barraSuperior.vrPosition.fY = AGScreenManager.iScreenHeight - barraSuperior.getSpriteHeight() / 2;
         barraSuperior.bAutoRender = false;
 
+
+        barraInferior = createSprite(R.drawable.back, 1, 1);
+        barraInferior.setScreenPercent(100, 10);
+        barraInferior.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
+        barraInferior.vrPosition.fY = barraInferior.getSpriteHeight() / 2;
+        barraInferior.bAutoRender = false;
+
+
+        setaEsquerda = createSprite(R.drawable.seta, 1, 1);
+        setaEsquerda.setScreenPercent(10, 8);
+        setaEsquerda.vrPosition.setX(setaEsquerda.getSpriteWidth());
+        setaEsquerda.vrPosition.setY(barraInferior.vrPosition.fY);
+        setaEsquerda.bAutoRender = false;
+
+        setaDireita = createSprite(R.drawable.seta, 1, 1);
+        setaDireita.setScreenPercent(10, 8);
+        setaDireita.iMirror = AGSprite.HORIZONTAL;
+        setaDireita.vrPosition.setX(setaEsquerda.getSpriteWidth() + setaDireita.getSpriteWidth() + setaDireita.getSpriteWidth() / 2);
+        setaDireita.vrPosition.setY(barraInferior.vrPosition.fY);
+        setaDireita.bAutoRender = false;
+
+        btnMartelinho = createSprite(R.drawable.martelinho, 1, 1);
+        btnMartelinho.setScreenPercent(13, 8);
+        btnMartelinho.vrPosition.fX = AGScreenManager.iScreenWidth - btnMartelinho.getSpriteWidth();
+        btnMartelinho.vrPosition.fY = barraInferior.vrPosition.fY;
+        btnMartelinho.bAutoRender = false;
+
+        btnMartelao = createSprite(R.drawable.martelao, 1, 1);
+        btnMartelao.setScreenPercent(15, 9);
+        btnMartelao.vrPosition.fX = AGScreenManager.iScreenWidth - btnMartelinho.getSpriteWidth() - btnMartelao.getSpriteWidth() - btnMartelinho.getSpriteWidth() / 2;
+        btnMartelao.vrPosition.fY = barraInferior.vrPosition.fY;
+        btnMartelao.bAutoRender = false;
+
+        // Carrega a imagem do Juiz na base da tela
+        juiz = createSprite(R.drawable.juiz, 1, 1);
+        juiz.setScreenPercent(15, 15);
+        juiz.vrPosition.setX(AGScreenManager.iScreenWidth / 2);
+        juiz.vrPosition.setY(juiz.getSpriteHeight() / 2 + barraInferior.getSpriteHeight());
+
         //DEFININDO OS NAVIOS
         navios[0] = createSprite(R.drawable.vampirao, 4, 2);
         navios[0].setScreenPercent(20, 12);
         navios[0].addAnimation(10, true, 0, 1, 2, 3, 4, 5, 6, 7);
-        navios[0].iMirror = AGSprite.HORIZONTAL;
+        //navios[0].iMirror = AGSprite.HORIZONTAL;
         navios[0].vrDirection.fX = 1;
         navios[0].vrPosition.fX = -navios[0].getSpriteWidth() / 2;
         navios[0].vrPosition.fY = AGScreenManager.iScreenHeight - navios[0].getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
@@ -118,7 +162,15 @@ public class CenaJogo extends AGScene {
 
     public void render() {
         super.render();
+        //atente-se para a ordem como os elementos são renderizados, pois como não há meios de definir a profundidade do elemento,
+        //o elemento q for chamado depois do outro, automaticamente vai os sobrepondo
         barraSuperior.render();
+        barraInferior.render();
+        btnMartelinho.render();
+        btnMartelao.render();
+        setaEsquerda.render();
+        setaDireita.render();
+
         for (AGSprite digito : placar) {
             digito.render();
         }
@@ -142,7 +194,6 @@ public class CenaJogo extends AGScene {
                 voltarMenu.bVisible = false;
                 gameOver.bRecycled = true;
                 gameOver.bVisible = false;
-                pontuacao = 100;
                 bPausa = false;
                 return;
             }
@@ -154,6 +205,11 @@ public class CenaJogo extends AGScene {
             }
         }
 
+        if (btnMartelinho.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+            bonificacao = martelinhoBonus;
+            penalizacao = martelaoPena;
+        }
+
 
 //        if (AGInputManager.vrTouchEvents.backButtonClicked()) {
 //            bPausa = !bPausa;
@@ -163,9 +219,9 @@ public class CenaJogo extends AGScene {
 
 
         if (bPausa == false) {
-            atualizaMovimentoCanhao();
-            atualizaBalas();
-            criaTiro();
+            movimentaJuiz();
+            atualizaMarteloes();
+            atiraMartelinho();
             atualizaNavios();
             verificaColisaoBalasNavios();
             atualizaExplosoes();
@@ -211,12 +267,12 @@ public class CenaJogo extends AGScene {
     }
 
     private void verificaColisaoBalasNavios() {
-        for (AGSprite bala : vetorTiros) {
+        for (AGSprite bala : vetorMarteloes) {
             if (bala.bRecycled)
                 continue;
             for (AGSprite navio : navios) {
                 if (bala.collide(navio)) {
-                    pontuacao += marteloGrandeBonus + marteloGrandePena;
+                    pontuacao += martelaoBonus + martelaoPena;
                     criaExplosao(navio.vrPosition.fX, navio.vrPosition.fY);
                     bala.bRecycled = true;
                     bala.bVisible = false;
@@ -235,40 +291,71 @@ public class CenaJogo extends AGScene {
         }
     }
 
-    // Coloca uma bala no vetor de tiros
-    private void criaTiro() {
+    //esse metodos está completamente bagunçado pq se trata de uns testes q só fazem sentido na cabeça do seu concebedor
+    private void atiraMartelinho() {
         tempoBala.update();
+        if (btnMartelinho.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+            bonificacao = martelinhoBonus;
+            penalizacao = martelinhoPena;
 
-        // Tenta reciclar uma bala criada anteriormente
-        if (AGInputManager.vrTouchEvents.screenClicked()) {
-            if (pontuacao <= 0) {
-                bPausa = true;
-                gameOver();
-            } else {
-                pontuacao -= marteloGrandePena;
-            }
             if (!tempoBala.isTimeEnded()) {
                 return;
             }
             tempoBala.restart();
 
-            for (AGSprite bala : vetorTiros) {
+            for (AGSprite bala : vetorMarteloes) {
                 if (bala.bRecycled) {
                     bala.bRecycled = false;
                     bala.bVisible = true;
-                    bala.vrPosition.fX = canhao.vrPosition.fX;
-                    bala.vrPosition.fY = canhao.getSpriteHeight() + bala.getSpriteHeight() / 2;
+                    bala.vrPosition.fX = juiz.vrPosition.fX;
+                    bala.vrPosition.fY = juiz.getSpriteHeight() + bala.getSpriteHeight() / 2;
                     return;
                 }
             }
 
             AGSprite novaBala = createSprite(R.drawable.martelo, 1, 1);
             novaBala.setScreenPercent(8, 5);
-            novaBala.vrPosition.fX = canhao.vrPosition.fX;
-            novaBala.vrPosition.fY = canhao.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
-            vetorTiros.add(novaBala);
+            novaBala.vrPosition.fX = juiz.vrPosition.fX;
+            novaBala.vrPosition.fY = juiz.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
+            vetorMarteloes.add(novaBala);
+
         }
     }
+
+    // Coloca uma bala no vetor de tiros
+//    private void criaTiro() {
+//        tempoBala.update();
+//
+//        // Tenta reciclar uma bala criada anteriormente
+//        if (AGInputManager.vrTouchEvents.screenClicked()) {
+//            if (pontuacao <= 0) {
+//                bPausa = true;
+//                gameOver();
+//            } else {
+//                pontuacao -= martelaoPena;
+//            }
+//            if (!tempoBala.isTimeEnded()) {
+//                return;
+//            }
+//            tempoBala.restart();
+//
+//            for (AGSprite bala : vetorMarteloes) {
+//                if (bala.bRecycled) {
+//                    bala.bRecycled = false;
+//                    bala.bVisible = true;
+//                    bala.vrPosition.fX = canhao.vrPosition.fX;
+//                    bala.vrPosition.fY = canhao.getSpriteHeight() + bala.getSpriteHeight() / 2;
+//                    return;
+//                }
+//            }
+//
+//            AGSprite novaBala = createSprite(R.drawable.martelo, 1, 1);
+//            novaBala.setScreenPercent(8, 5);
+//            novaBala.vrPosition.fX = canhao.vrPosition.fX;
+//            novaBala.vrPosition.fY = canhao.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
+//            vetorMarteloes.add(novaBala);
+//        }
+//    }
 
     private void gameOver() {
         // Carrega a imagem gameover
@@ -291,8 +378,8 @@ public class CenaJogo extends AGScene {
     }
 
     // metodo para atualizar o movimento das balas
-    private void atualizaBalas() {
-        for (AGSprite bala : vetorTiros) {
+    private void atualizaMarteloes() {
+        for (AGSprite bala : vetorMarteloes) {
             bala.vrPosition.fY += 10;
             bala.fAngle -= 10f;
 
@@ -331,23 +418,45 @@ public class CenaJogo extends AGScene {
         }
     }
 
-    // Metodo criado para movimentar o canhao
-    private void atualizaMovimentoCanhao() {
+
+    private void movimentaJuiz() {
         tempoCanhao.update();
         if (tempoCanhao.isTimeEnded()) {
             tempoCanhao.restart();
-            if (AGInputManager.vrAccelerometer.getAccelX() > 2.0f) {
-                if (canhao.vrPosition.getX() <= AGScreenManager.iScreenWidth - canhao.getSpriteWidth() / 2) {
-                    AGSoundManager.vrSoundEffects.play(efeitoCatraca);
-                    canhao.vrPosition.setX(canhao.vrPosition.getX() + 10);
+            if (setaDireita.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                if (juiz.vrPosition.getX() <= AGScreenManager.iScreenWidth - juiz.getSpriteWidth() / 2) {
+                    //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+                    juiz.vrPosition.setX(juiz.vrPosition.getX() + 10);
                 }
-            } else if (AGInputManager.vrAccelerometer.getAccelX() < -2.0f) {
-                if (canhao.vrPosition.getX() > 0 + canhao.getSpriteWidth() / 2) {
-                    AGSoundManager.vrSoundEffects.play(efeitoCatraca);
-                    canhao.vrPosition.setX(canhao.vrPosition.getX() - 10);
+            }
+            if (setaEsquerda.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                if (juiz.vrPosition.getX() > 0 + juiz.getSpriteWidth() / 2) {
+                    //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+                    juiz.vrPosition.setX(juiz.vrPosition.getX() - 10);
                 }
             }
         }
+
     }
+
+
+    // Metodo criado para movimentar o canhao
+//    private void atualizaMovimentoCanhao() {
+//        tempoCanhao.update();
+//        if (tempoCanhao.isTimeEnded()) {
+//            tempoCanhao.restart();
+//            if (AGInputManager.vrAccelerometer.getAccelX() > 2.0f) {
+//                if (canhao.vrPosition.getX() <= AGScreenManager.iScreenWidth - canhao.getSpriteWidth() / 2) {
+//                    AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+//                    canhao.vrPosition.setX(canhao.vrPosition.getX() + 10);
+//                }
+//            } else if (AGInputManager.vrAccelerometer.getAccelX() < -2.0f) {
+//                if (canhao.vrPosition.getX() > 0 + canhao.getSpriteWidth() / 2) {
+//                    AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+//                    canhao.vrPosition.setX(canhao.vrPosition.getX() - 10);
+//                }
+//            }
+//        }
+//    }
 
 }
