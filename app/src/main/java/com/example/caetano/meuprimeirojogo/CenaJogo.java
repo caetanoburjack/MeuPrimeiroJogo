@@ -35,6 +35,9 @@ public class CenaJogo extends AGScene {
     private AGSprite btnVoltar = null;
     private AGSprite planoFundo = null;
     private AGSprite juiz = null;
+    private AGSprite barraMunicao = null;
+    private AGSprite barraMunicaoCheia = null;
+    private AGSprite barraMunicaoVazia = null;
     private AGSprite barraSuperior = null;
     private AGSprite barraInferior = null;
     private AGSprite btnMartelinho = null;
@@ -76,13 +79,30 @@ public class CenaJogo extends AGScene {
         planoFundo.vrPosition.setY(AGScreenManager.iScreenHeight / 2);
 
 
-
-
         barraSuperior = createSprite(R.drawable.back, 1, 1);
         barraSuperior.setScreenPercent(100, 6);
         barraSuperior.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
         barraSuperior.vrPosition.fY = AGScreenManager.iScreenHeight - barraSuperior.getSpriteHeight() / 2;
         barraSuperior.bAutoRender = false;
+
+
+        barraMunicao = createSprite(R.drawable.barravazia, 1, 1);
+        barraMunicao.setScreenPercent(100, 2);
+        barraMunicao.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
+        barraMunicao.vrPosition.fY = AGScreenManager.iScreenHeight - barraMunicao.getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
+        barraMunicao.bAutoRender = false;
+
+        barraMunicaoVazia = createSprite(R.drawable.fundovazio, 1, 1);
+        barraMunicaoVazia.setScreenPercent(100, 2);
+        barraMunicaoVazia.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
+        barraMunicaoVazia.vrPosition.fY = AGScreenManager.iScreenHeight - barraMunicaoVazia.getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
+        barraMunicaoVazia.bAutoRender = false;
+
+        barraMunicaoCheia = createSprite(R.drawable.fundocheio, 1, 1);
+        barraMunicaoCheia.setScreenPercent(100, 2);
+        barraMunicaoCheia.vrPosition.fX = AGScreenManager.iScreenWidth / 2;
+        barraMunicaoCheia.vrPosition.fY = AGScreenManager.iScreenHeight - barraMunicaoCheia.getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
+        barraMunicaoCheia.bAutoRender = false;
 
 
         barraInferior = createSprite(R.drawable.back, 1, 1);
@@ -127,7 +147,7 @@ public class CenaJogo extends AGScene {
         navios[0] = createSprite(R.drawable.vampirao, 4, 2);
         navios[0].setScreenPercent(20, 12);
         navios[0].addAnimation(10, true, 0, 1, 2, 3, 4, 5, 6, 7);
-        //navios[0].iMirror = AGSprite.HORIZONTAL;
+        navios[0].iMirror = AGSprite.HORIZONTAL;
         navios[0].vrDirection.fX = 1;
         navios[0].vrPosition.fX = -navios[0].getSpriteWidth() / 2;
         navios[0].vrPosition.fY = AGScreenManager.iScreenHeight - navios[0].getSpriteHeight() / 2 - barraSuperior.getSpriteHeight();
@@ -170,6 +190,9 @@ public class CenaJogo extends AGScene {
         btnMartelao.render();
         setaEsquerda.render();
         setaDireita.render();
+        barraMunicaoVazia.render();
+        barraMunicaoCheia.render();
+        //barraMunicao.render();
 
         for (AGSprite digito : placar) {
             digito.render();
@@ -211,17 +234,18 @@ public class CenaJogo extends AGScene {
         }
 
 
-//        if (AGInputManager.vrTouchEvents.backButtonClicked()) {
-//            bPausa = !bPausa;
-//// vrGameManager.setCurrentScene(0);
-////            return;
-//        }
+        if (AGInputManager.vrTouchEvents.backButtonClicked()) {
+            //bPausa = !bPausa;
+            vrGameManager.setCurrentScene(0);
+            //return;
+        }
 
 
         if (bPausa == false) {
             movimentaJuiz();
             atualizaMarteloes();
             atiraMartelinho();
+            //criaTiro();
             atualizaNavios();
             verificaColisaoBalasNavios();
             atualizaExplosoes();
@@ -294,10 +318,48 @@ public class CenaJogo extends AGScene {
     //esse metodos está completamente bagunçado pq se trata de uns testes q só fazem sentido na cabeça do seu concebedor
     private void atiraMartelinho() {
         tempoBala.update();
-        if (btnMartelinho.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
-            bonificacao = martelinhoBonus;
-            penalizacao = martelinhoPena;
+        if (AGInputManager.vrTouchEvents.screenDown()) {
+            if (btnMartelinho.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                barraMunicaoCheia.vrPosition.fX = barraMunicaoCheia.vrPosition.fX - 30;
+                bonificacao = martelinhoBonus;
+                penalizacao = martelinhoPena;
 
+                if (!tempoBala.isTimeEnded()) {
+                    return;
+                }
+                tempoBala.restart();
+
+                for (AGSprite bala : vetorMarteloes) {
+                    if (bala.bRecycled) {
+                        bala.bRecycled = false;
+                        bala.bVisible = true;
+                        bala.vrPosition.fX = juiz.vrPosition.fX;
+                        bala.vrPosition.fY = juiz.getSpriteHeight() + bala.getSpriteHeight() / 2;
+                        return;
+                    }
+                }
+
+                AGSprite novaBala = createSprite(R.drawable.martelo, 1, 1);
+                novaBala.setScreenPercent(8, 5);
+                novaBala.vrPosition.fX = juiz.vrPosition.fX;
+                novaBala.vrPosition.fY = juiz.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
+                vetorMarteloes.add(novaBala);
+            }
+        }
+    }
+
+    // Coloca uma bala no vetor de tiros
+    private void criaTiro() {
+        tempoBala.update();
+
+        // Tenta reciclar uma bala criada anteriormente
+        if (AGInputManager.vrTouchEvents.screenClicked()) {
+//            if (pontuacao <= 0) {
+//                bPausa = true;
+//                gameOver();
+//            } else {
+//                pontuacao -= martelaoPena;
+//            }
             if (!tempoBala.isTimeEnded()) {
                 return;
             }
@@ -318,44 +380,8 @@ public class CenaJogo extends AGScene {
             novaBala.vrPosition.fX = juiz.vrPosition.fX;
             novaBala.vrPosition.fY = juiz.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
             vetorMarteloes.add(novaBala);
-
         }
     }
-
-    // Coloca uma bala no vetor de tiros
-//    private void criaTiro() {
-//        tempoBala.update();
-//
-//        // Tenta reciclar uma bala criada anteriormente
-//        if (AGInputManager.vrTouchEvents.screenClicked()) {
-//            if (pontuacao <= 0) {
-//                bPausa = true;
-//                gameOver();
-//            } else {
-//                pontuacao -= martelaoPena;
-//            }
-//            if (!tempoBala.isTimeEnded()) {
-//                return;
-//            }
-//            tempoBala.restart();
-//
-//            for (AGSprite bala : vetorMarteloes) {
-//                if (bala.bRecycled) {
-//                    bala.bRecycled = false;
-//                    bala.bVisible = true;
-//                    bala.vrPosition.fX = canhao.vrPosition.fX;
-//                    bala.vrPosition.fY = canhao.getSpriteHeight() + bala.getSpriteHeight() / 2;
-//                    return;
-//                }
-//            }
-//
-//            AGSprite novaBala = createSprite(R.drawable.martelo, 1, 1);
-//            novaBala.setScreenPercent(8, 5);
-//            novaBala.vrPosition.fX = canhao.vrPosition.fX;
-//            novaBala.vrPosition.fY = canhao.getSpriteHeight() + novaBala.getSpriteHeight() / 2;
-//            vetorMarteloes.add(novaBala);
-//        }
-//    }
 
     private void gameOver() {
         // Carrega a imagem gameover
@@ -423,16 +449,18 @@ public class CenaJogo extends AGScene {
         tempoCanhao.update();
         if (tempoCanhao.isTimeEnded()) {
             tempoCanhao.restart();
-            if (setaDireita.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
-                if (juiz.vrPosition.getX() <= AGScreenManager.iScreenWidth - juiz.getSpriteWidth() / 2) {
-                    //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
-                    juiz.vrPosition.setX(juiz.vrPosition.getX() + 10);
+            if (AGInputManager.vrTouchEvents.screenDown()) {
+                if (setaDireita.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                    if (juiz.vrPosition.getX() <= AGScreenManager.iScreenWidth - juiz.getSpriteWidth() / 2) {
+                        //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+                        juiz.vrPosition.setX(juiz.vrPosition.getX() + 10);
+                    }
                 }
-            }
-            if (setaEsquerda.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
-                if (juiz.vrPosition.getX() > 0 + juiz.getSpriteWidth() / 2) {
-                    //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
-                    juiz.vrPosition.setX(juiz.vrPosition.getX() - 10);
+                if (setaEsquerda.collide(AGInputManager.vrTouchEvents.getLastPosition())) {
+                    if (juiz.vrPosition.getX() > 0 + juiz.getSpriteWidth() / 2) {
+                        //AGSoundManager.vrSoundEffects.play(efeitoCatraca);
+                        juiz.vrPosition.setX(juiz.vrPosition.getX() - 10);
+                    }
                 }
             }
         }
